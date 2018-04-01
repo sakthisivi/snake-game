@@ -6,7 +6,8 @@
 var interval;
 var arrowKey=0;
 var x,y;
- var snakeRepo = new Array();
+var snakeRepo = new Array();
+
 
  function initialfunc()
 {
@@ -19,25 +20,29 @@ interval = setInterval(mainFunction,200);
 
 }
 
+function activeArray()
+{
+var activeRect = new Array();
+var tempRect = $('*[class^="rect"]');
+var x1=[],y1=[];
+	for(let i=1;i<=tempRect.length;i++)
+	{
+	x1[i]= document.getElementsByClassName("rect"+i)[0].getAttributeNS(null,'x');
+	y1[i]= document.getElementsByClassName("rect"+i)[0].getAttributeNS(null,'y');
+	activeRect.push([parseInt(x1[i]),parseInt(y1[i])]);
+	}
+return activeRect;
+}
+
+
 function createNewtail()
 {
-var tempRect = $('*[class^="rect"]');
+var activeRects = activeArray();
 var newTail = Array();
-var activeRect = new Array();
-var x1=[],y1=[];
-for(let i=1;i<=tempRect.length;i++)
-{
-x1[i]= document.getElementsByClassName("rect"+i)[0].getAttributeNS(null,'x');
-y1[i]= document.getElementsByClassName("rect"+i)[0].getAttributeNS(null,'y');
-activeRect.push([parseInt(x1[i]),parseInt(y1[i])]);
-}
-//var dummy = [[700,280],[1,2]];
-console.log(activeRect);
-console.log(activeRect[0][1]);
 newTail = snakeRepo.filter(function (val){	
-			for (var i=0;i<activeRect.length;i++)
+			for (var i=0;i<activeRects.length;i++)
 			{
-			if( val[0] == activeRect[i][0] && val[1] == activeRect[i][1] ){
+			if( val[0] == activeRects[i][0] && val[1] == activeRects[i][1] ){
 			return false;	}	
 			}
 			return true;
@@ -88,8 +93,17 @@ for (xRepo = 310;xRepo <=1085;xRepo=xRepo+15)
 console.log(snakeRepo.length);
 }
 
-function hasDuplicates(array) {
-    return (new Set(array)).size !== array.length;
+function hasDuplicates() {
+var activeRect = activeArray();
+var tempArray = new Array();
+tempArray[0]=activeRect[0].join("1");
+for (let i=1;i<activeRect.length;i++)
+	{
+	tempArray.push(activeRect[i].join("1"));
+	if(tempArray[0] == tempArray[i]){
+	return true;}
+	}
+return false;
 }
 
 
@@ -98,7 +112,6 @@ function mainFunction()
 //console.time('mainFunction');
 var tempRect = $('*[class^="rect"]');
 var x1=[],y1=[];
-
 document.addEventListener('keydown', checkArrowKey);
 for(let i=1;i<=tempRect.length;i++)
 {
@@ -114,10 +127,10 @@ var yHead = head.getAttributeNS(null,'y');
 var xHead = head.getAttributeNS(null,'x');
 var xHead2 = head2.getAttributeNS(null,'x');
 var yHead2 = head2.getAttributeNS(null,'y');
-var snakeCollision= hasDuplicates(x1);
+var snakeCollision= hasDuplicates();
 console.log(snakeCollision);
 
- 	if(xHead < 1090 && xHead > 305 && yHead > 50 && yHead < 545  )
+ 	if(xHead < 1090 && xHead > 305 && yHead > 50 && yHead < 545 && !snakeCollision)
 	{
 		switch(arrowKey){
 		case 37:
