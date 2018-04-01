@@ -1,0 +1,197 @@
+<html>
+<head>
+<meta charset="utf-8"/>
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script>
+var interval;
+var arrowKey=0;
+var x,y;
+ var snakeRepo = new Array();
+
+ function initialfunc()
+{
+//console.time('repository');
+repository();
+//console.timeEnd('repository');
+//alert("Press any Key to start");
+
+interval = setInterval(mainFunction,200);
+
+}
+
+function createNewtail()
+{
+var tempRect = $('*[class^="rect"]');
+var newTail = Array();
+var activeRect = new Array();
+var x1=[],y1=[];
+for(let i=1;i<=tempRect.length;i++)
+{
+x1[i]= document.getElementsByClassName("rect"+i)[0].getAttributeNS(null,'x');
+y1[i]= document.getElementsByClassName("rect"+i)[0].getAttributeNS(null,'y');
+activeRect.push([parseInt(x1[i]),parseInt(y1[i])]);
+}
+//var dummy = [[700,280],[1,2]];
+console.log(activeRect);
+console.log(activeRect[0][1]);
+newTail = snakeRepo.filter(function (val){	
+			for (var i=0;i<activeRect.length;i++)
+			{
+			if( val[0] == activeRect[i][0] && val[1] == activeRect[i][1] ){
+			return false;	}	
+			}
+			return true;
+			});
+console.log(newTail.length);
+var newTailindexes = newTail[Math.floor(Math.random()*newTail.length)];
+console.log(newTailindexes);
+
+var newRect = document.createElementNS('http://www.w3.org/2000/svg','rect'); 
+    newRect.setAttributeNS(null,'class','xrect');
+    newRect.setAttributeNS(null,'x',newTailindexes[0]);
+    newRect.setAttributeNS(null,'y',newTailindexes[1]);
+    newRect.setAttributeNS(null,'width',10);
+    newRect.setAttributeNS(null,'height',10);
+    newRect.setAttributeNS(null,'fill','blue');
+    newRect.setAttributeNS(null,'stroke','blue');
+    newRect.setAttributeNS(null,'stroke-width',3);
+    document.getElementById('svghome').appendChild(newRect);
+}
+
+function checkArrowKey(e) {
+    var event = window.event ? window.event : e;
+	//37 left 38 up 39 right 40 down
+	if(event.keyCode === 37 || event.keyCode === 38 || event.keyCode === 39 || event.keyCode === 40){
+	event.preventDefault();
+	if((arrowKey === 0) || 
+		((event.keyCode === 37 || event.keyCode === 39) && (arrowKey === 38 || arrowKey === 40)) || 
+				((event.keyCode === 38 || event.keyCode === 40) && (arrowKey === 37 || arrowKey === 39)))
+		{
+		arrowKey=event.keyCode;
+		}
+	}
+//console.log(arrowKey);
+}
+
+function repository()
+{
+var xRepo,yRepo,count=0;
+for (xRepo = 310;xRepo <=1085;xRepo=xRepo+15)
+	{
+		for (yRepo = 55;yRepo <=535;yRepo=yRepo+15)
+			{
+				snakeRepo.push([xRepo,yRepo]);
+				//console.log(snakeRepo);
+				count=count+1;
+			}
+	}
+console.log(snakeRepo.length);
+}
+
+function hasDuplicates(array) {
+    return (new Set(array)).size !== array.length;
+}
+
+
+function mainFunction()
+{
+//console.time('mainFunction');
+var tempRect = $('*[class^="rect"]');
+var x1=[],y1=[];
+
+document.addEventListener('keydown', checkArrowKey);
+for(let i=1;i<=tempRect.length;i++)
+{
+x1[i]= document.getElementsByClassName("rect"+i)[0].getAttributeNS(null,'x');
+y1[i]= document.getElementsByClassName("rect"+i)[0].getAttributeNS(null,'y');
+
+//console.log(y1[i]);
+}
+//console.log(arrowKey);37 left 38 up 39 right 40 down
+var head = document.getElementsByClassName("rect1")[0];
+var head2 = document.getElementsByClassName("rect2")[0];
+var yHead = head.getAttributeNS(null,'y');
+var xHead = head.getAttributeNS(null,'x');
+var xHead2 = head2.getAttributeNS(null,'x');
+var yHead2 = head2.getAttributeNS(null,'y');
+var snakeCollision= hasDuplicates(x1);
+console.log(snakeCollision);
+
+ 	if(xHead < 1090 && xHead > 305 && yHead > 50 && yHead < 545  )
+	{
+		switch(arrowKey){
+		case 37:
+		head = head.setAttributeNS(null,'x',xHead-15);
+		break;
+		case 38:
+		head = head.setAttributeNS(null,'y',yHead-15);
+		break;
+		case 39:
+		head = head.setAttributeNS(null,'x',parseInt(xHead)+15);
+		break;
+		case 40:
+		head = head.setAttributeNS(null,'y',parseInt(yHead)+15);
+		break;
+		default:
+		head=head.setAttributeNS(null,'y',yHead-15);
+		
+		}
+		
+		var tail = document.getElementsByClassName("xrect")[0];
+		if(tail)
+		{
+		var xx = tail.getAttributeNS(null,'x');
+		var yy = tail.getAttributeNS(null,'y');
+		if(xx == xHead && yy == yHead)
+		{
+			let currentLength = tempRect.length+1;
+			document.getElementsByClassName("xrect")[0].setAttribute("class","rect"+(tempRect.length+1));
+			document.getElementsByClassName("rect"+(tempRect.length+1))[0].setAttribute("style","fill:black;stroke:black;stroke-width:3");
+			//document.getElementsByClassName("rect"+(tempRect.length+1))[0].setAttributeNS(null,'troke','black');
+			console.time('createNewtail');
+			createNewtail();
+			console.timeEnd('createNewtail');
+			
+		}
+		}		
+	
+
+		let index=1;
+		for( index=1; index < tempRect.length; index++) 
+		{
+			tempRect[index].setAttributeNS(null,'x',x1[index]);
+       			tempRect[index].setAttributeNS(null,'y',y1[index]);	
+ 		}
+
+	}
+ 	else
+ 	{
+ 	endFunc();
+ 	}
+//console.timeEnd('mainFunction');
+}
+function endFunc()
+{
+clearInterval(interval);
+alert("Game Over");
+}
+
+</script>
+</head>
+<body onload="initialfunc();">
+
+<svg xmlns="http://www.w3.org/2000/svg" id="svghome" width="1150" height="1000" >
+  <rect id="home" x="300" y="50" width="800" height="500" style="fill:rgb(147,197,114);stroke-width:6;stroke:rgb(0,0,0)" />
+
+
+<rect class="rect1" x="700" y="505" width="10" height="10" style="fill:rgb(255,0,0);stroke-width:3;stroke:rgb(255,0,0)" />
+<rect class="rect2" x="700" y="520" width="10" height="10" style="fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)" />
+<rect class="rect3" x="700" y="535" width="10" height="10" style="fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)" />
+<rect class="xrect" x="700" y ="280" width="10" height="10" style="fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,255)" />
+
+  Sorry, your browser does not support inline SVG.  
+</svg>
+
+ 
+</body>
+</html>
